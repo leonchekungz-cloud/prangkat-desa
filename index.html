@@ -7,8 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
-        .camera-container { position: relative; overflow: hidden; border-radius: 0.75rem; background: #000; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .camera-container { position: relative; overflow: hidden; border-radius: 0.75rem; background: #0f172a; }
         #video-preview { width: 100%; object-fit: cover; transform: scaleX(-1); }
         #canvas-capture { display: none; }
         /* Custom scrollbar */
@@ -18,39 +18,51 @@
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body class="text-gray-800 antialiased min-h-screen flex flex-col">
+<body class="text-gray-800 antialiased min-h-screen flex flex-col justify-between">
 
-    <header class="bg-emerald-700 text-white shadow-md sticky top-0 z-10">
-        <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+    <header class="bg-emerald-700 text-white shadow-md sticky top-0 z-20">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between flex-wrap gap-2">
             <div class="flex items-center gap-3">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                <div class="p-2 bg-emerald-800/80 rounded-lg">
+                    <svg class="w-6 h-6 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                </div>
                 <div>
-                    <h1 class="text-xl font-bold leading-tight">Desa Pintar</h1>
-                    <p class="text-xs text-emerald-200">Portal Absensi Perangkat Desa</p>
+                    <h1 class="text-lg font-bold leading-tight">Desa Pintar</h1>
+                    <p class="text-xs text-emerald-100">Portal Presensi Perangkat Desa</p>
                 </div>
             </div>
-            <div id="connection-status" class="flex items-center gap-2 text-xs bg-emerald-800 px-2 py-1 rounded-full">
-                <span class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse" id="status-dot"></span>
-                <span id="status-text">Menghubungkan...</span>
+            
+            <div class="flex items-center gap-3 text-xs">
+                <div id="live-clock" class="bg-emerald-800/60 px-3 py-1.5 rounded-md font-mono hidden sm:block">00:00:00 WIB</div>
+                <div id="connection-status" class="flex items-center gap-2 bg-emerald-900/60 px-2.5 py-1.5 rounded-md">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" id="status-dot"></span>
+                    <span id="status-text" class="font-medium">Menghubungkan...</span>
+                </div>
             </div>
         </div>
     </header>
 
-    <main class="flex-1 max-w-4xl mx-auto w-full px-4 py-6 grid md:grid-cols-2 gap-6">
+    <main class="flex-1 max-w-5xl mx-auto w-full px-4 py-6 grid lg:grid-cols-12 gap-6">
         
-        <!-- Form Absensi -->
-        <section class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex flex-col h-fit">
-            <h2 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Form Kehadiran</h2>
+        <!-- Form Absensi Section -->
+        <section class="lg:col-span-5 bg-white rounded-xl shadow-sm border border-gray-200 p-5 flex flex-col h-fit">
+            <div class="border-b pb-3 mb-4 flex items-center justify-between">
+                <div>
+                    <h2 class="text-base font-bold text-gray-800">Form Absensi Hadir</h2>
+                    <p class="text-xs text-gray-500">Isi data dan amankan bukti kehadiran Anda</p>
+                </div>
+                <span class="text-xs font-semibold px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-200">Mandiri</span>
+            </div>
             
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-600 mb-1">Nama Lengkap</label>
-                    <input type="text" id="input-name" placeholder="Contoh: Budi Santoso" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all">
+                    <label for="input-name" class="block text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wider">Nama Lengkap <span class="text-red-500">*</span></label>
+                    <input type="text" id="input-name" placeholder="Contoh: Budi Santoso, S.Sos" class="w-full px-3.5 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all">
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-medium text-gray-600 mb-1">Jabatan</label>
-                    <select id="input-role" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all bg-white">
+                    <label for="input-role" class="block text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wider">Jabatan Perangkat Desa <span class="text-red-500">*</span></label>
+                    <select id="input-role" class="w-full px-3.5 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all bg-white">
                         <option value="">-- Pilih Jabatan --</option>
                         <option value="Kepala Desa">Kepala Desa</option>
                         <option value="Sekretaris Desa">Sekretaris Desa (Sekdes)</option>
@@ -59,223 +71,313 @@
                         <option value="Kasi Pemerintahan">Kasi Pemerintahan</option>
                         <option value="Kasi Kesejahteraan">Kasi Kesejahteraan</option>
                         <option value="Kasi Pelayanan">Kasi Pelayanan</option>
-                        <option value="Kepala Dusun">Kepala Dusun</option>
+                        <option value="Kepala Dusun I">Kepala Dusun I</option>
+                        <option value="Kepala Dusun II">Kepala Dusun II</option>
                         <option value="Staf Desa">Staf Desa</option>
                     </select>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-600 mb-1">Foto Selfie Kehadiran</label>
-                    <div class="camera-container aspect-[4/3] bg-gray-200 flex items-center justify-center relative">
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider">Foto Selfie <span class="text-red-500">*</span></label>
+                        <span id="gps-status" class="text-[11px] text-gray-400 flex items-center gap-1">
+                            <svg class="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            GPS Otomatis
+                        </span>
+                    </div>
+
+                    <div class="camera-container aspect-[4/3] flex items-center justify-center relative border border-gray-200">
                         <video id="video-preview" autoplay playsinline class="hidden"></video>
-                        <img id="photo-result" class="hidden w-full h-full object-cover transform scale-x-[-1]" />
+                        <img id="photo-result" class="hidden w-full h-full object-cover" alt="Hasil Foto Selfie" />
                         
-                        <div id="camera-placeholder" class="text-center text-gray-500 flex flex-col items-center">
-                            <svg class="w-10 h-10 mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                            <p class="text-sm">Kamera tidak aktif</p>
+                        <div id="camera-placeholder" class="text-center text-gray-400 flex flex-col items-center p-4">
+                            <svg class="w-12 h-12 mb-2 text-gray-500 stroke-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            <p class="text-xs text-gray-300 font-medium">Pilih Kamera, Upload Foto, atau Gunakan Sampel</p>
                         </div>
 
-                        <!-- Action Buttons Overlay -->
-                        <div class="absolute bottom-3 left-0 w-full flex justify-center gap-2 px-3">
-                            <button id="btn-start-camera" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm py-1.5 px-4 rounded-full shadow transition-colors">Nyalakan Kamera</button>
-                            <button id="btn-capture" class="hidden bg-white text-emerald-700 hover:bg-gray-100 font-medium text-sm py-1.5 px-4 rounded-full shadow transition-colors flex items-center gap-1">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <!-- Action Overlay -->
+                        <div class="absolute bottom-2 left-0 w-full flex justify-center gap-1.5 px-2 flex-wrap z-10">
+                            <button id="btn-start-camera" type="button" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium py-1.5 px-3 rounded-md shadow transition-colors flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                Nyalakan Kamera
+                            </button>
+                            <button id="btn-upload-file" type="button" class="bg-slate-700 hover:bg-slate-800 text-white text-xs font-medium py-1.5 px-2.5 rounded-md shadow transition-colors flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                Upload Foto
+                            </button>
+                            <button id="btn-sample-photo" type="button" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium py-1.5 px-2.5 rounded-md shadow transition-colors flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                Sample Foto
+                            </button>
+                            <button id="btn-capture" type="button" class="hidden bg-emerald-500 hover:bg-emerald-600 text-white font-medium text-xs py-1.5 px-4 rounded-md shadow transition-colors flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg>
                                 Ambil Foto
                             </button>
-                            <button id="btn-retake" class="hidden bg-gray-800/80 hover:bg-gray-900 text-white text-sm py-1.5 px-4 rounded-full shadow transition-colors backdrop-blur-sm">Ulangi</button>
+                            <button id="btn-retake" type="button" class="hidden bg-slate-800/90 hover:bg-slate-900 text-white text-xs py-1.5 px-3 rounded-md shadow transition-colors backdrop-blur-sm">Ambil Ulang</button>
                         </div>
                     </div>
+                    <input type="file" id="file-input-photo" accept="image/*" class="hidden" />
                     <canvas id="canvas-capture"></canvas>
                 </div>
 
-                <button id="btn-submit" disabled class="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-medium py-3 rounded-lg shadow transition-colors flex items-center justify-center gap-2 mt-4">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Kirim Absensi Sekarang
+                <button id="btn-submit" disabled type="button" class="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-medium py-2.5 rounded-lg shadow-sm transition-all flex items-center justify-center gap-2 mt-2 text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Kirim Presensi Sekarang
                 </button>
             </div>
         </section>
 
-        <!-- Riwayat Absensi -->
-        <section class="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col h-[600px]">
-            <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 rounded-t-xl">
-                <h2 class="text-lg font-semibold text-gray-700">Riwayat Kehadiran</h2>
-                <span class="text-xs text-gray-500 font-medium px-2 py-1 bg-gray-200 rounded-md">Hari Ini</span>
+        <!-- Riwayat Absensi Section -->
+        <section class="lg:col-span-7 bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col h-[640px]">
+            <!-- Header section with search and export -->
+            <div class="p-4 border-b border-gray-100 bg-slate-50/50 rounded-t-xl space-y-3">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-base font-bold text-gray-800">Riwayat Kehadiran Realtime</h2>
+                        <p class="text-xs text-gray-500">Tersimpan otomatis di database cloud</p>
+                    </div>
+                    <button id="btn-export-csv" class="hidden text-xs bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-semibold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 border border-emerald-300">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Export CSV
+                    </button>
+                </div>
+
+                <!-- Stats Summary Row -->
+                <div class="grid grid-cols-2 gap-3 pt-1">
+                    <div class="bg-white p-2.5 rounded-lg border border-gray-200 shadow-2xs">
+                        <span class="text-[10px] uppercase font-bold text-gray-400">Total Absen Hari Ini</span>
+                        <div class="text-lg font-extrabold text-emerald-600" id="stat-total-today">0</div>
+                    </div>
+                    <div class="bg-white p-2.5 rounded-lg border border-gray-200 shadow-2xs">
+                        <span class="text-[10px] uppercase font-bold text-gray-400">Terakhir Absen</span>
+                        <div class="text-xs font-bold text-gray-700 truncate" id="stat-last-time">-</div>
+                    </div>
+                </div>
+
+                <!-- Filter / Search input -->
+                <div class="relative">
+                    <input type="text" id="search-input" placeholder="Cari berdasarkan nama atau jabatan..." class="w-full pl-9 pr-3 py-1.5 text-xs bg-white border border-gray-200 rounded-lg focus:ring-1 focus:ring-emerald-500 outline-none">
+                    <svg class="w-4 h-4 text-gray-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
             </div>
             
-            <div id="attendance-list" class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50/50">
-                <!-- Data will be loaded here -->
+            <!-- List Container -->
+            <div id="attendance-list" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/30">
                 <div class="flex flex-col items-center justify-center h-full text-gray-400">
-                    <svg class="w-10 h-10 mb-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                    <p class="text-sm">Memuat data...</p>
+                    <svg class="w-8 h-8 mb-2 animate-spin text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    <p class="text-xs">Memuat data dari database...</p>
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- Modal Alert (Menggantikan alert bawaan browser) -->
-    <div id="modal-alert" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center backdrop-blur-sm opacity-0 transition-opacity duration-300">
-        <div class="bg-white rounded-xl shadow-xl p-6 max-w-sm w-full mx-4 transform scale-95 transition-transform duration-300">
-            <div id="modal-icon" class="w-12 h-12 rounded-full flex items-center justify-center mb-4 mx-auto"></div>
-            <h3 id="modal-title" class="text-lg font-bold text-center text-gray-800 mb-2">Pemberitahuan</h3>
-            <p id="modal-message" class="text-sm text-gray-600 text-center mb-6">Pesan di sini.</p>
-            <button onclick="closeModal()" class="w-full bg-gray-900 hover:bg-black text-white font-medium py-2 rounded-lg transition-colors">Tutup</button>
+    <footer class="bg-white border-t border-gray-200 py-3 text-center text-xs text-gray-500">
+        <p>&copy; 2026 Pemerintah Desa Pintar. Sistem Informasi Presensi Digital.</p>
+    </footer>
+
+    <!-- Modal UI Replacement for alert() -->
+    <div id="custom-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white rounded-xl max-w-sm w-full p-5 shadow-xl transform scale-95 transition-transform duration-200" id="modal-box">
+            <div class="flex items-center gap-3 mb-3">
+                <div id="modal-icon-bg" class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                    <svg id="modal-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <h3 id="modal-title" class="text-base font-bold text-gray-800">Pemberitahuan</h3>
+            </div>
+            <p id="modal-message" class="text-xs text-gray-600 mb-5 leading-relaxed">Pesan modal disini.</p>
+            <button id="modal-close" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs py-2 rounded-lg transition-colors">Tutup</button>
         </div>
     </div>
 
+    <!-- Firebase Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Configuration (from environment variables)
-        let firebaseConfig = {};
-        try {
-            firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        } catch (e) {
-            console.warn("Using default demo config");
-            // Placeholder if environment is missing, usually overridden by platform
-        }
+        // Global Variables Environment Check
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'absensi-desa-app';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "demo-key",
+            authDomain: "demo.firebaseapp.com",
+            projectId: "demo-project",
+            storageBucket: "demo.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:demo"
+        };
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
+        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
-        
-        // App settings
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'desa-pintar-absensi';
-        // Path koleksi Firestore (Harus mengikuti strict path rules)
-        const collectionPath = `artifacts/${appId}/public/data/attendance`;
-        let currentUser = null;
 
-        // UI Elements
-        const statusText = document.getElementById('status-text');
+        let currentUser = null;
+        let allAttendanceRecords = [];
+        const collectionPath = `artifacts/${appId}/public/data/absensi`;
+
+        // UI DOM Elements
         const statusDot = document.getElementById('status-dot');
+        const statusText = document.getElementById('status-text');
+        const liveClock = document.getElementById('live-clock');
         const attendanceList = document.getElementById('attendance-list');
-        const btnSubmit = document.getElementById('btn-submit');
-        
-        window.showModal = (title, message, type = 'info') => {
-            const modal = document.getElementById('modal-alert');
-            const modalTitle = document.getElementById('modal-title');
-            const modalMessage = document.getElementById('modal-message');
-            const modalIcon = document.getElementById('modal-icon');
-            
-            modalTitle.textContent = title;
-            modalMessage.textContent = message;
-            
+        const searchInput = document.getElementById('search-input');
+        const btnExportCsv = document.getElementById('btn-export-csv');
+        const statTotalToday = document.getElementById('stat-total-today');
+        const statLastTime = document.getElementById('stat-last-time');
+
+        // Modal Helpers
+        const customModal = document.getElementById('custom-modal');
+        const modalBox = document.getElementById('modal-box');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMessage = document.getElementById('modal-message');
+        const modalClose = document.getElementById('modal-close');
+        const modalIconBg = document.getElementById('modal-icon-bg');
+        const modalIcon = document.getElementById('modal-icon');
+
+        function showModal(title, message, type = 'info') {
+            modalTitle.innerText = title;
+            modalMessage.innerText = message;
+
             if (type === 'error') {
-                modalIcon.className = 'w-12 h-12 rounded-full flex items-center justify-center mb-4 mx-auto bg-red-100 text-red-600';
-                modalIcon.innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+                modalIconBg.className = 'w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0';
+                modalIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>`;
             } else if (type === 'success') {
-                modalIcon.className = 'w-12 h-12 rounded-full flex items-center justify-center mb-4 mx-auto bg-emerald-100 text-emerald-600';
-                modalIcon.innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+                modalIconBg.className = 'w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0';
+                modalIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>`;
             } else {
-                modalIcon.className = 'w-12 h-12 rounded-full flex items-center justify-center mb-4 mx-auto bg-blue-100 text-blue-600';
-                modalIcon.innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+                modalIconBg.className = 'w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0';
+                modalIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>`;
             }
 
-            modal.classList.remove('hidden');
-            // Small timeout to allow display:flex to apply before animating opacity
+            customModal.classList.remove('hidden');
             setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                modal.querySelector('div').classList.remove('scale-95');
+                customModal.classList.remove('opacity-0');
+                modalBox.classList.remove('scale-95');
             }, 10);
-        };
+        }
 
-        window.closeModal = () => {
-            const modal = document.getElementById('modal-alert');
-            modal.classList.add('opacity-0');
-            modal.querySelector('div').classList.add('scale-95');
+        modalClose.addEventListener('click', () => {
+            customModal.classList.add('opacity-0');
+            modalBox.classList.add('scale-95');
             setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
-        };
+                customModal.classList.add('hidden');
+            }, 200);
+        });
 
+        // Live Clock
+        setInterval(() => {
+            const now = new Date();
+            if (liveClock) {
+                liveClock.innerText = now.toLocaleTimeString('id-ID') + ' WIB';
+            }
+        }, 1000);
+
+        // Authentication Setup
         async function initAuth() {
             try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
                 } else {
                     await signInAnonymously(auth);
                 }
-                
-                currentUser = auth.currentUser;
-                
-                statusText.textContent = "Terhubung";
-                statusDot.classList.replace('bg-yellow-400', 'bg-emerald-400');
-                statusDot.classList.remove('animate-pulse');
-                
-                // Setelah auth berhasil, load data
-                loadAttendanceData();
-                
-            } catch (error) {
-                console.error("Auth error:", error);
-                statusText.textContent = "Gagal Konek";
-                statusDot.classList.replace('bg-yellow-400', 'bg-red-500');
-                showModal('Koneksi Gagal', 'Gagal terhubung ke server database.', 'error');
+            } catch (err) {
+                console.warn("Auth initial retry:", err);
+                try {
+                    await signInAnonymously(auth);
+                } catch (anonErr) {
+                    console.error("Auth Error:", anonErr);
+                }
             }
         }
 
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                statusDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400";
+                statusText.innerText = "Terhubung";
+                loadAttendanceData();
+            } else {
+                currentUser = null;
+                statusDot.className = "w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse";
+                statusText.innerText = "Menghubungkan...";
+            }
+            validateForm();
+        });
+
+        // Fetch & Realtime Listen Firestore
         function loadAttendanceData() {
             if (!currentUser) return;
 
-            const attCollection = collection(db, collectionPath);
+            const attCollection = collection(db, 'artifacts', appId, 'public', 'data', 'absensi');
             
-            // Aturan Firestore: Jangan pakai query kompleks seperti orderBy di sini
-            // Kita fetch semua, lalu sorting di memori (JavaScript)
             onSnapshot(attCollection, (snapshot) => {
                 const records = [];
                 snapshot.forEach((doc) => {
                     records.push({ id: doc.id, ...doc.data() });
                 });
 
-                // Sort descending berdasarkan timestamp (terbaru di atas)
-                records.sort((a, b) => b.timestamp - a.timestamp);
-                renderAttendance(records);
+                // Sort newest first
+                records.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                allAttendanceRecords = records;
+                renderAttendance(allAttendanceRecords);
+                updateStats(allAttendanceRecords);
 
             }, (error) => {
                 console.error("Error fetching data: ", error);
-                attendanceList.innerHTML = `<div class="p-4 text-center text-red-500 text-sm">Gagal memuat data.</div>`;
+                attendanceList.innerHTML = `<div class="p-4 text-center text-red-500 text-xs">Gagal memuat data dari database. Silakan periksa koneksi internet Anda.</div>`;
             });
         }
 
+        // Render Cards
         function renderAttendance(records) {
-            if (records.length === 0) {
+            const filterKeyword = (searchInput.value || '').toLowerCase().trim();
+            const filtered = records.filter(r => {
+                return (r.name || '').toLowerCase().includes(filterKeyword) ||
+                       (r.role || '').toLowerCase().includes(filterKeyword);
+            });
+
+            if (btnExportCsv) {
+                if (records.length > 0) btnExportCsv.classList.remove('hidden');
+                else btnExportCsv.classList.add('hidden');
+            }
+
+            if (filtered.length === 0) {
                 attendanceList.innerHTML = `
                     <div class="flex flex-col items-center justify-center h-full text-gray-400 p-8 text-center">
-                        <svg class="w-12 h-12 mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        <p class="text-sm">Belum ada data absensi hari ini.</p>
+                        <svg class="w-12 h-12 mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        <p class="text-xs font-medium">${filterKeyword ? 'Tidak ada data cocok dengan pencarian.' : 'Belum ada data absensi hari ini.'}</p>
                     </div>`;
                 return;
             }
 
             attendanceList.innerHTML = '';
-            
-            // Format hari ini untuk memisahkan data hari ini vs sebelumnya jika diperlukan
-            const todayStr = new Date().toLocaleDateString('id-ID');
 
-            records.forEach(record => {
-                const dateObj = new Date(record.timestamp);
+            filtered.forEach(record => {
+                const dateObj = new Date(record.timestamp || Date.now());
                 const timeStr = dateObj.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
                 const dateStr = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
                 
-                // Card item
                 const card = document.createElement('div');
-                card.className = "bg-white p-3 rounded-lg border border-gray-100 shadow-sm flex items-start gap-3 hover:shadow-md transition-shadow";
+                card.className = "bg-white p-3 rounded-lg border border-gray-200 shadow-2xs flex items-center justify-between gap-3 hover:border-emerald-200 transition-colors";
                 
                 card.innerHTML = `
-                    <div class="w-12 h-12 rounded-full bg-gray-200 overflow-hidden flex-shrink-0 border-2 border-emerald-100">
-                        ${record.photo ? `<img src="${record.photo}" class="w-full h-full object-cover transform scale-x-[-1]" alt="Selfie">` : `<svg class="w-full h-full text-gray-400 p-2" fill="currentColor" viewBox="0 0 24 24"><path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" /></svg>`}
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-11 h-11 rounded-full bg-slate-100 overflow-hidden flex-shrink-0 border border-emerald-200">
+                            ${record.photo ? `<img src="${record.photo}" class="w-full h-full object-cover" alt="Selfie">` : `<div class="w-full h-full flex items-center justify-center text-gray-400 font-bold text-sm">${(record.name || 'P')[0]}</div>`}
+                        </div>
+                        <div class="min-w-0">
+                            <h4 class="font-bold text-gray-800 text-xs truncate">${record.name || 'Perangkat Desa'}</h4>
+                            <p class="text-[11px] text-gray-500 truncate">${record.role || '-'}</p>
+                            ${record.location ? `
+                            <a href="https://maps.google.com/?q=${record.location.lat},${record.location.lng}" target="_blank" rel="noopener" class="text-[10px] text-emerald-600 hover:underline flex items-center gap-1 mt-0.5 truncate">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
+                                Lokasi Google Maps
+                            </a>` : `<span class="text-[10px] text-gray-400">Tanpa GPS</span>`}
+                        </div>
                     </div>
-                    <div class="flex-1 min-w-0">
-                        <h4 class="font-semibold text-gray-800 text-sm truncate">${record.name}</h4>
-                        <p class="text-xs text-gray-500 truncate">${record.role}</p>
-                        ${record.location ? `
-                        <a href="https://maps.google.com/?q=${record.location.lat},${record.location.lng}" target="_blank" class="text-[10px] text-blue-500 hover:underline flex items-center gap-1 mt-1 truncate">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                            Lokasi Tersimpan
-                        </a>` : ''}
-                    </div>
-                    <div class="text-right">
-                        <span class="block text-emerald-600 font-bold text-sm">${timeStr}</span>
+                    <div class="text-right flex-shrink-0">
+                        <span class="block text-emerald-700 font-extrabold text-xs">${timeStr} WIB</span>
                         <span class="block text-[10px] text-gray-400">${dateStr}</span>
                     </div>
                 `;
@@ -283,83 +385,218 @@
             });
         }
 
+        function updateStats(records) {
+            const todayStr = new Date().toDateString();
+            const todayCount = records.filter(r => new Date(r.timestamp || 0).toDateString() === todayStr).length;
+            
+            statTotalToday.innerText = `${todayCount} Orang`;
+            if (records.length > 0) {
+                const latest = new Date(records[0].timestamp || Date.now());
+                statLastTime.innerText = `${latest.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})} (${records[0].name.split(' ')[0]})`;
+            } else {
+                statLastTime.innerText = '-';
+            }
+        }
+
+        searchInput.addEventListener('input', () => {
+            renderAttendance(allAttendanceRecords);
+        });
+
+        // Export CSV
+        btnExportCsv.addEventListener('click', () => {
+            if (!allAttendanceRecords || allAttendanceRecords.length === 0) return;
+            
+            let csvContent = "data:text/csv;charset=utf-8,No,Waktu,Tanggal,Nama,Jabatan,Latitude,Longitude\n";
+            allAttendanceRecords.forEach((r, idx) => {
+                const d = new Date(r.timestamp || Date.now());
+                const time = d.toLocaleTimeString('id-ID');
+                const date = d.toLocaleDateString('id-ID');
+                const name = `"${(r.name || '').replace(/"/g, '""')}"`;
+                const role = `"${(r.role || '').replace(/"/g, '""')}"`;
+                const lat = r.location ? r.location.lat : '';
+                const lng = r.location ? r.location.lng : '';
+                csvContent += `${idx+1},${time},${date},${name},${role},${lat},${lng}\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `absensi_desa_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        // Camera & Photo Controls Logic
         const video = document.getElementById('video-preview');
         const canvas = document.getElementById('canvas-capture');
         const photoResult = document.getElementById('photo-result');
         const btnStartCam = document.getElementById('btn-start-camera');
+        const btnUploadFile = document.getElementById('btn-upload-file');
+        const btnSamplePhoto = document.getElementById('btn-sample-photo');
+        const fileInputPhoto = document.getElementById('file-input-photo');
         const btnCapture = document.getElementById('btn-capture');
         const btnRetake = document.getElementById('btn-retake');
         const cameraPlaceholder = document.getElementById('camera-placeholder');
-        
+        const btnSubmit = document.getElementById('btn-submit');
+        const inputName = document.getElementById('input-name');
+        const inputRole = document.getElementById('input-role');
+
         let stream = null;
         let capturedPhotoBase64 = null;
 
+        btnUploadFile.addEventListener('click', () => fileInputPhoto.click());
+
+        fileInputPhoto.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    canvas.width = 320;
+                    canvas.height = 240;
+                    const context = canvas.getContext('2d');
+                    context.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    capturedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.6);
+
+                    photoResult.src = capturedPhotoBase64;
+                    photoResult.classList.remove('hidden');
+                    video.classList.add('hidden');
+                    cameraPlaceholder.classList.add('hidden');
+
+                    btnStartCam.classList.add('hidden');
+                    btnUploadFile.classList.add('hidden');
+                    btnSamplePhoto.classList.add('hidden');
+                    btnCapture.classList.add('hidden');
+                    btnRetake.classList.remove('hidden');
+
+                    validateForm();
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Sample Photo Generator
+        btnSamplePhoto.addEventListener('click', () => {
+            canvas.width = 320;
+            canvas.height = 240;
+            const context = canvas.getContext('2d');
+
+            // Background
+            const gradient = context.createLinearGradient(0, 0, 320, 240);
+            gradient.addColorStop(0, '#047857');
+            gradient.addColorStop(1, '#065f46');
+            context.fillStyle = gradient;
+            context.fillRect(0, 0, 320, 240);
+
+            // User Avatar Silhouette
+            context.fillStyle = '#ffffff';
+            context.beginPath();
+            context.arc(160, 90, 38, 0, Math.PI * 2);
+            context.fill();
+
+            context.beginPath();
+            context.arc(160, 210, 65, 0, Math.PI * 2);
+            context.fill();
+
+            // Text tag
+            context.fillStyle = '#ffffff';
+            context.font = 'bold 12px Inter, sans-serif';
+            context.textAlign = 'center';
+            context.fillText('FOTO PRESENSI SAMPEL', 160, 215);
+
+            capturedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
+            photoResult.src = capturedPhotoBase64;
+            photoResult.classList.remove('hidden');
+            video.classList.add('hidden');
+            cameraPlaceholder.classList.add('hidden');
+
+            btnStartCam.classList.add('hidden');
+            btnUploadFile.classList.add('hidden');
+            btnSamplePhoto.classList.add('hidden');
+            btnCapture.classList.add('hidden');
+            btnRetake.classList.remove('hidden');
+
+            validateForm();
+        });
+
+        // Webcam Start
         btnStartCam.addEventListener('click', async () => {
             try {
-                // Meminta akses kamera (kamera depan jika di HP)
-                stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "user" }, 
-                    audio: false 
-                });
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    throw new Error("Kamera tidak didukung oleh browser Anda.");
+                }
+
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+                } catch (facingErr) {
+                    stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                }
                 
                 video.srcObject = stream;
-                
-                // Ubah UI
                 video.classList.remove('hidden');
                 cameraPlaceholder.classList.add('hidden');
                 btnStartCam.classList.add('hidden');
+                btnUploadFile.classList.add('hidden');
+                btnSamplePhoto.classList.add('hidden');
                 btnCapture.classList.remove('hidden');
-                btnCapture.classList.add('flex');
 
             } catch (err) {
-                console.error("Camera access denied or error:", err);
-                showModal('Akses Kamera', 'Gagal mengakses kamera. Pastikan browser memiliki izin untuk menggunakan kamera.', 'error');
+                console.warn("Camera Init Error:", err);
+                showModal(
+                    'Kamera Tidak Tersedia', 
+                    'Webcam/kamera tidak terdeteksi atau izin ditolak. Silakan manfaatkan tombol "Upload Foto" atau "Sample Foto" untuk melanjutkan presensi.', 
+                    'info'
+                );
             }
         });
 
         btnCapture.addEventListener('click', () => {
             if (!stream) return;
             
-            // Set canvas size (kompresi resolusi agar base64 tidak terlalu besar untuk Firestore)
-            // Resolusi 400x300 sudah cukup baik untuk thumbnail selfie presensi
-            canvas.width = 400;
-            canvas.height = 300;
-            
+            canvas.width = 320;
+            canvas.height = 240;
             const context = canvas.getContext('2d');
-            // Draw video frame to canvas
+            
+            // Mirror flip matching video preview
+            context.translate(canvas.width, 0);
+            context.scale(-1, 1);
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
             
-            // Convert to Base64 (JPEG format with 0.7 quality untuk kompresi)
-            capturedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+            capturedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.6);
             
-            // Tampilkan foto hasil dan matikan sementara video
             photoResult.src = capturedPhotoBase64;
             photoResult.classList.remove('hidden');
             video.classList.add('hidden');
             
-            // Ubah tombol
             btnCapture.classList.add('hidden');
-            btnCapture.classList.remove('flex');
             btnRetake.classList.remove('hidden');
 
-            // Cek form validasi untuk tombol submit
             validateForm();
         });
 
         btnRetake.addEventListener('click', () => {
             capturedPhotoBase64 = null;
             photoResult.classList.add('hidden');
-            video.classList.remove('hidden');
-            
+            fileInputPhoto.value = '';
+
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+
+            cameraPlaceholder.classList.remove('hidden');
+            btnStartCam.classList.remove('hidden');
+            btnUploadFile.classList.remove('hidden');
+            btnSamplePhoto.classList.remove('hidden');
+            btnCapture.classList.add('hidden');
             btnRetake.classList.add('hidden');
-            btnCapture.classList.remove('hidden');
-            btnCapture.classList.add('flex');
-            
             validateForm();
         });
-
-        const inputName = document.getElementById('input-name');
-        const inputRole = document.getElementById('input-role');
 
         function validateForm() {
             const name = inputName.value.trim();
@@ -375,11 +612,10 @@
         inputName.addEventListener('input', validateForm);
         inputRole.addEventListener('change', validateForm);
 
-        // Mendapatkan lokasi saat ini
         function getCurrentLocation() {
             return new Promise((resolve, reject) => {
                 if (!navigator.geolocation) {
-                    reject("Geolocation tidak didukung oleh browser ini.");
+                    reject("Geolocation tidak didukung.");
                 } else {
                     navigator.geolocation.getCurrentPosition(
                         (position) => {
@@ -391,7 +627,7 @@
                         (error) => {
                             reject(error.message);
                         },
-                        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                        { enableHighAccuracy: true, timeout: 4000, maximumAge: 0 }
                     );
                 }
             });
@@ -399,68 +635,61 @@
 
         btnSubmit.addEventListener('click', async () => {
             if (!currentUser) {
-                showModal('Error', 'Anda belum terhubung ke database. Tunggu sebentar.', 'error');
+                showModal('Belum Terhubung', 'Sistem sedang menghubungkan ke database cloud. Silakan tunggu beberapa detik.', 'error');
                 return;
             }
 
             const name = inputName.value.trim();
             const role = inputRole.value;
 
-            // UI Loading state
-            const originalBtnText = btnSubmit.innerHTML;
+            const originalBtnHtml = btnSubmit.innerHTML;
             btnSubmit.setAttribute('disabled', 'true');
-            btnSubmit.innerHTML = `<svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Memproses...`;
+            btnSubmit.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Menyimpan Kehadiran...`;
 
             try {
-                // Ambil lokasi perangkat opsional
                 let userLocation = null;
                 try {
                     userLocation = await getCurrentLocation();
                 } catch (locErr) {
-                    console.log("Location fetch failed, continuing without location:", locErr);
-                    // Lanjut tanpa lokasi jika gagal/ditolak izinnya
+                    console.log("GPS Location ignored/failed:", locErr);
                 }
 
-                // Data yang akan disimpan ke Firestore
                 const attendanceData = {
                     userId: currentUser.uid,
                     name: name,
                     role: role,
-                    photo: capturedPhotoBase64, // Disimpan sebagai string base64
+                    photo: capturedPhotoBase64,
                     location: userLocation,
                     timestamp: Date.now()
                 };
 
-                // Insert to Firebase
-                const attCollection = collection(db, collectionPath);
+                const attCollection = collection(db, 'artifacts', appId, 'public', 'data', 'absensi');
                 await addDoc(attCollection, attendanceData);
 
                 // Reset Form
                 inputName.value = '';
                 inputRole.value = '';
-                btnRetake.click(); // Reset camera
-                showModal('Berhasil', 'Absensi kehadiran berhasil disimpan!', 'success');
+                btnRetake.click();
+                showModal('Absensi Berhasil!', 'Data kehadiran Anda telah tercatat di database cloud desa.', 'success');
 
             } catch (error) {
                 console.error("Error saving attendance:", error);
-                showModal('Gagal', 'Terjadi kesalahan saat menyimpan data. Coba lagi.', 'error');
+                showModal('Gagal Menyimpan', 'Terjadi kesalahan sistem saat mengirim data. Silakan coba lagi.', 'error');
             } finally {
-                // Restore button
-                btnSubmit.innerHTML = originalBtnText;
-                validateForm(); // Re-validate to set correct disabled state
+                btnSubmit.innerHTML = originalBtnHtml;
+                validateForm();
             }
         });
 
-        // Hentikan kamera jika tab ditutup/pindah
+        // Clean up camera stream if navigating away
         window.addEventListener('beforeunload', () => {
             if (stream) {
                 stream.getTracks().forEach(track => track.stop());
             }
         });
 
-        // Initialize Authentication on load
+        // Start Auth Initialization
         initAuth();
-
     </script>
 </body>
 </html>
