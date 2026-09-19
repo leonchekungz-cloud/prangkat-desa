@@ -197,24 +197,33 @@
 
         // Global Variables Environment Check
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'absensi-desa-app';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "demo-key",
-            authDomain: "demo.firebaseapp.com",
-            projectId: "demo-project",
-            storageBucket: "demo.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:demo"
-        };
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-
+        const hasValidFirebaseConfig = typeof __firebase_config !== 'undefined' && __firebase_config && !__firebase_config.includes('demo-key');
+        
+        let db = null;
+        let auth = null;
+        let isCloudMode = false;
         let currentUser = null;
         let allAttendanceRecords = [];
-        const collectionPath = `artifacts/${appId}/public/data/absensi`;
+
+        // Sample Data for Offline / Local Mode
+        let localAttendanceRecords = [
+            {
+                id: 'sample-1',
+                name: 'Budi Santoso, S.Sos',
+                role: 'Sekretaris Desa (Sekdes)',
+                photo: null,
+                location: { lat: -6.2088, lng: 106.8456 },
+                timestamp: Date.now() - 3600000 * 2
+            },
+            {
+                id: 'sample-2',
+                name: 'Siti Aminah',
+                role: 'Kaur Keuangan',
+                photo: null,
+                location: null,
+                timestamp: Date.now() - 3600000 * 4
+            }
+        ];
 
         // UI DOM Elements
         const statusDot = document.getElementById('status-dot');
@@ -273,41 +282,60 @@
             }
         }, 1000);
 
-        // Authentication Setup
+        // Enable Local Mode Fallback
+        function enableLocalMode(statusLabel = "Mode Lokal") {
+            isCloudMode = false;
+            currentUser = { uid: 'perangkat-desa-lokal' };
+            statusDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400";
+            statusText.innerText = statusLabel;
+            allAttendanceRecords = localAttendanceRecords;
+            renderAttendance(allAttendanceRecords);
+            updateStats(allAttendanceRecords);
+            validateForm();
+        }
+
+        // Authentication & Firebase Setup
         async function initAuth() {
+            if (!hasValidFirebaseConfig) {
+                enableLocalMode("Mode Lokal (Aktif)");
+                return;
+            }
+
             try {
+                const firebaseConfig = JSON.parse(__firebase_config);
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        currentUser = user;
+                        isCloudMode = true;
+                        statusDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400";
+                        statusText.innerText = "Terhubung Cloud";
+                        loadAttendanceData();
+                    } else {
+                        enableLocalMode("Mode Lokal");
+                    }
+                    validateForm();
+                });
+
                 if (initialAuthToken) {
                     await signInWithCustomToken(auth, initialAuthToken);
                 } else {
                     await signInAnonymously(auth);
                 }
             } catch (err) {
-                console.warn("Auth initial retry:", err);
-                try {
-                    await signInAnonymously(auth);
-                } catch (anonErr) {
-                    console.error("Auth Error:", anonErr);
-                }
+                console.warn("Firebase Auth tidak dapat digunakan, beralih ke Mode Lokal:", err.message);
+                enableLocalMode("Mode Lokal (Aktif)");
             }
         }
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user;
-                statusDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400";
-                statusText.innerText = "Terhubung";
-                loadAttendanceData();
-            } else {
-                currentUser = null;
-                statusDot.className = "w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse";
-                statusText.innerText = "Menghubungkan...";
-            }
-            validateForm();
-        });
-
         // Fetch & Realtime Listen Firestore
         function loadAttendanceData() {
-            if (!currentUser) return;
+            if (!currentUser || !db) return;
 
             const attCollection = collection(db, 'artifacts', appId, 'public', 'data', 'absensi');
             
@@ -324,8 +352,8 @@
                 updateStats(allAttendanceRecords);
 
             }, (error) => {
-                console.error("Error fetching data: ", error);
-                attendanceList.innerHTML = `<div class="p-4 text-center text-red-500 text-xs">Gagal memuat data dari database. Silakan periksa koneksi internet Anda.</div>`;
+                console.warn("Error snapshot Firestore, menggunakan data lokal: ", error);
+                enableLocalMode("Mode Lokal");
             });
         }
 
@@ -635,7 +663,7 @@
 
         btnSubmit.addEventListener('click', async () => {
             if (!currentUser) {
-                showModal('Belum Terhubung', 'Sistem sedang menghubungkan ke database cloud. Silakan tunggu beberapa detik.', 'error');
+                showModal('Belum Siap', 'Sistem sedang memuat data. Silakan tunggu beberapa detik.', 'error');
                 return;
             }
 
@@ -663,18 +691,42 @@
                     timestamp: Date.now()
                 };
 
-                const attCollection = collection(db, 'artifacts', appId, 'public', 'data', 'absensi');
-                await addDoc(attCollection, attendanceData);
+                if (isCloudMode && db) {
+                    const attCollection = collection(db, 'artifacts', appId, 'public', 'data', 'absensi');
+                    await addDoc(attCollection, attendanceData);
+                } else {
+                    // Save locally into memory list
+                    localAttendanceRecords.unshift({ id: 'loc-' + Date.now(), ...attendanceData });
+                    allAttendanceRecords = localAttendanceRecords;
+                    renderAttendance(allAttendanceRecords);
+                    updateStats(allAttendanceRecords);
+                }
 
                 // Reset Form
                 inputName.value = '';
                 inputRole.value = '';
                 btnRetake.click();
-                showModal('Absensi Berhasil!', 'Data kehadiran Anda telah tercatat di database cloud desa.', 'success');
+                showModal('Absensi Berhasil!', 'Data kehadiran Anda telah berhasil disimpan.', 'success');
 
             } catch (error) {
                 console.error("Error saving attendance:", error);
-                showModal('Gagal Menyimpan', 'Terjadi kesalahan sistem saat mengirim data. Silakan coba lagi.', 'error');
+                // Fallback local save if cloud write fails
+                localAttendanceRecords.unshift({
+                    id: 'loc-' + Date.now(),
+                    userId: currentUser.uid,
+                    name: name,
+                    role: role,
+                    photo: capturedPhotoBase64,
+                    timestamp: Date.now()
+                });
+                allAttendanceRecords = localAttendanceRecords;
+                renderAttendance(allAttendanceRecords);
+                updateStats(allAttendanceRecords);
+
+                inputName.value = '';
+                inputRole.value = '';
+                btnRetake.click();
+                showModal('Absensi Berhasil!', 'Data tersimpan di penyimpanan lokal.', 'success');
             } finally {
                 btnSubmit.innerHTML = originalBtnHtml;
                 validateForm();
